@@ -1,0 +1,22 @@
+{
+  "name": "gold_info",
+  "version": "0.0.1",
+  "description": "",
+  "type": "module",
+  "main": "backend/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "kryq",
+  "license": "UNLICENCED",
+  "dependencies": {
+    "@fastify/cors": "^8.2.0",
+    "@fastify/static": "^6.9.0",
+    "@seald-io/nedb": "^4.0.1",
+    "@xmldom/xmldom": "^0.8.6",
+    "cheerio": "^1.0.0-rc.12",
+    "fastify": "^4.13.0",
+    "node-schedule": "^2.1.1",
+    "xpath": "^0.0.32"
+  }
+}
