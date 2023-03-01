@@ -7,6 +7,10 @@ import ShopTreasuryMint from "./shops/ShopTreasuryMint.js";
 import ShopElement79 from "./shops/ShopElement79.js";
 import ShopPolishMint from "./shops/ShopPolishMint.js";
 import {coins} from "./constants.js";
+import ShopSilverMint from "./shops/ShopSilverMint.js";
+import ShopMetalMarket from "./shops/ShopMetalMarket.js";
+import ShopMintOfGdansk from "./shops/ShopMintOfGdansk.js";
+import ShopChojnackiKwiecien from "./shops/ShopChojnackiKwiecien.js";
 
 const shops = [
   new ShopCoinInvest(),
@@ -17,6 +21,10 @@ const shops = [
   new ShopTreasuryMint(),
   new ShopElement79(),
   new ShopPolishMint(),
+  new ShopSilverMint(),
+  new ShopMetalMarket(),
+  new ShopMintOfGdansk(),
+  new ShopChojnackiKwiecien()
 ]
 
 const getGoldPrice = async () => {
@@ -55,6 +63,12 @@ const scrapeGoldPrices = async () => {
     })));
 
     const prices = pricesPromises.filter(price => price.status === 'fulfilled').map(price => price.value);
+
+    pricesPromises.filter(price => price.status === 'rejected').forEach(price => {
+      if (price.reason.message.includes('Price couldn')) {
+        console.log(price.reason)
+      }
+    })
 
     return {
       name: coin,

@@ -27,12 +27,16 @@ class BaseShop {
     this.coins = coins;
   }
 
-  _scrapePrice = async (path, selector) => {
+  async _scrapePrice(path, selector) {
     const data = await fetch(this.address + path);
     const site = await data.text();
 
     const rawPrice = $(selector, site).text();
     const price = parseFloat(rawPrice.replace(/[^0-9,.]+/g, '').replace(',', '.'));
+
+    if (!price) {
+      throw new Error(`[${this.id}] Price couldn't be obtained`);
+    }
 
     return price;
   }
@@ -41,7 +45,7 @@ class BaseShop {
     const handledCoin = this.coins.find(handledCoin => handledCoin.name === coin);
 
     if (!handledCoin) {
-      throw new Error("Coin not handled by this shop");
+      throw new Error(`Coin not handled by this shop: ${coin}`);
     }
 
     return this._scrapePrice(handledCoin.path, this.priceSelector);

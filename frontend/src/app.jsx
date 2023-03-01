@@ -2,13 +2,13 @@ import {useEffect, useState} from 'preact/hooks';
 import Coin from "./components/Coin.jsx";
 
 export function App() {
-  const [coinPrices, setCoinPrices] = useState([]);
+  const [data, setData] = useState({});
 
   const getCoins = async () => {
-    const response = await fetch('http://localhost:3001/rest/coins');
+    const response = await fetch('http://localhost:3001/rest/data/newest');
     const data = await response.json();
 
-    setCoinPrices(data);
+    setData(data);
   }
 
   useEffect(() => {
@@ -16,8 +16,13 @@ export function App() {
   }, []);
 
   return (
-      <>
-        {coinPrices.map(coin => <Coin {...coin} />)}
-      </>
+      <div className="p-2">
+        <div className="grid grid-cols-3 gap-4">
+          {data.coinPrices && data.coinPrices.map(coin =>
+              <Coin name={coin.name} shopPrices={coin.prices} goldPrice={data.goldPrice} updated={data.timestamp}/>
+          )}
+        </div>
+      </div>
+
   )
 }

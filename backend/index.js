@@ -16,16 +16,14 @@ fastify.register(FastifyCors, {
   origin: true
 })
 
-fastify.get('/rest/coins', async (request, reply) => {
+fastify.get('/rest/data/newest', async (request, reply) => {
   const data = await db.findAsync({}).sort({timestamp: -1}).limit(1);
 
   if (data.length === 0) {
     throw new Error('NOT_FOUND');
   }
 
-  const {coinPrices} = data.at(0);
-
-  return coinPrices;
+  return data.at(0);
 })
 
 fastify.get('/rest/data', async (request, reply) => {
