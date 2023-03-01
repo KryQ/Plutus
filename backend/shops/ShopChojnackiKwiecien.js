@@ -1,7 +1,7 @@
 import {coins} from "../constants.js";
 import BaseShop from "./BaseShop.js";
 
-class ShopApartMint extends BaseShop {
+class ShopChojnackiKwiecien extends BaseShop {
   constructor() {
     super('CHOJNACKI_KWIECIEN', "Chojnacki & Kwiecień", 'https://chojnackikwiecien.pl');
 
@@ -36,4 +36,4 @@ class ShopApartMint extends BaseShop {
   }
 }
 
-export default ShopApartMint;
+export default ShopChojnackiKwiecien;
