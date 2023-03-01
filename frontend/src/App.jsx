@@ -1,7 +1,7 @@
-import {useEffect, useState} from 'preact/hooks';
+import {useEffect, useState} from 'react'
 import Coin from "./components/Coin.jsx";
 
-export function App() {
+function App() {
   const [data, setData] = useState({});
 
   const getCoins = async () => {
@@ -23,6 +23,7 @@ export function App() {
           )}
         </div>
       </div>
-
   )
 }
+
+export default App

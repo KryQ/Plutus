@@ -6,7 +6,7 @@ const CoinCard = ({name, shopPrices, goldPrice, updated}) => {
   const expensiveShop = shopPrices.reduce((highest, current) => current.price > highest.price ? current : highest, {price: 0});
 
   const updatedDate = parseISO(updated);
-  
+
   return (
       <div className="bg-white rounded-md p-2 text-sm">
         <div className="card-header">
