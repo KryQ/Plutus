@@ -26,6 +26,12 @@ fastify.get('/rest/data/newest', async (request, reply) => {
   return data.at(0);
 })
 
+fastify.get('/rest/gold', async (request, reply) => {
+  const data = await db.findAsync({}).sort({timestamp: 1})
+
+  return data.map(point => ({price: point.goldPrice, timestamp: point.timestamp}));
+});
+
 fastify.get('/rest/data', async (request, reply) => {
   return db.findAsync({}).sort({timestamp: 1});
 })
