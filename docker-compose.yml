@@ -1,0 +1,20 @@
+version: "3.8"
+
+services:
+  plutus:
+    image: sha256:f252f2937f01022d24d3cac44177132b55f062f71d6830c533ea625e48247942
+    ports:
+      - 3031:3001
+    volumes:
+      - database:/data
+    deploy:
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.plutus.rule=Host(`plutus.krule`)"
+        - "traefik.http.routers.plutus.entrypoints=web"
+        - "traefik.http.services.plutus.loadbalancer.server.port=3001"
+    environment:
+      - NODE_ENV=production
+
+volumes:
+  database:

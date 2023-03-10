@@ -5,11 +5,13 @@ import Datastore from '@seald-io/nedb';
 import schedule from 'node-schedule';
 import scrapeGoldPrices from './scrapeGoldPrices.js';
 
-const db = new Datastore({filename: 'data.db'});
+const storageLocation = process.env.NODE_ENV === 'production' ? '/data' : '.';
+const db = new Datastore({filename: storageLocation + '/data.db'});
 
 const fastify = Fastify({logger: true});
+const publicPath = process.env.NODE_ENV === 'production' ? `${process.cwd()}/backend` : process.cwd();
 fastify.register(FastifyStatic, {
-  root: `${process.cwd()}/public`,
+  root: `${publicPath}/public`,
   prefix: '/',
 })
 fastify.register(FastifyCors, {
@@ -43,7 +45,7 @@ const main = async () => {
 
   schedule.scheduleJob('*/10 * * * *', scrapeAndStorePrices)
 
-  await fastify.listen({port: 3001})
+  await fastify.listen({port: 3001, host: '0.0.0.0'})
 }
 
 main();

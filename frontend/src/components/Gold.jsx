@@ -69,7 +69,7 @@ const LineChart = ({data, width, height}) => {
           <Group.Group left={0} top={0}>
             <Shape.AreaClosed
                 fill="rgb(245 158 11)"
-                fill-opacity="0.3"
+                fillOpacity="0.3"
                 data={data}
                 x={(d) => timeScale(getDate(d)) ?? 0}
                 y={(d) => rdScale(getRD(d)) ?? 0}
@@ -95,12 +95,12 @@ const LineChart = ({data, width, height}) => {
                   />
                 </g>
             )}
-            {tooltipData && tooltipData.map((d, i) => (<g>
+            {tooltipData && tooltipData.map((d) => (<g>
               <Glyph.GlyphCircle
                   left={tooltipLeft}
-                  top={rdScale(d.amount) + 2}
+                  top={rdScale(d.price) + 2}
                   size={110}
-                  fill={"#f0f"}
+                  fill={"#cbb"}
                   stroke={'white'}
                   strokeWidth={2}/>
             </g>))}
@@ -113,14 +113,13 @@ const LineChart = ({data, width, height}) => {
         </svg>
         {/* render a tooltip */}
         {tooltipData ? (
-            <Tooltip.TooltipWithBounds key={Math.random()}
-                                       top={tooltipTop}
-                                       left={tooltipLeft}
-                                       style={tooltipStyles}
+            <Tooltip.TooltipWithBounds
+                key={Math.random()}
+                top={tooltipTop}
+                left={tooltipLeft}
+                style={tooltipStyles}
             >
-              <p>{`Total Spend: $${getRD(tooltipData[1])}`}</p>
-              <p>{`Renewable Spend: $${getRD(tooltipData[0])}`}</p>
-              {/*<p>{`Year: ${getDate(tooltipData[1])}`}</p>*/}
+              <p>{`Cena złota: $${getRD(tooltipData[0])}`}</p>
             </Tooltip.TooltipWithBounds>
         ) : null}
       </div>
@@ -131,7 +130,7 @@ const GoldCard = ({goldPrice}) => {
   const [data, setData] = useState([]);
 
   const getGoldPrices = async () => {
-    const response = await fetch('http://localhost:3001/rest/gold');
+    const response = await fetch(`/rest/gold`);
     const data = await response.json();
 
     setData(data);
@@ -143,8 +142,9 @@ const GoldCard = ({goldPrice}) => {
 
   return (
       <div className="bg-white  rounded-md overflow-hidden shadow">
-        <div>
-          <h2 className="font-mono">{goldPrice}</h2>
+        <div className="flex gap-1 p-2 items-end w-full">
+          <span className="ml-auto">Aktualna cena złota: </span>
+          <h2 className="font-mono">{(goldPrice).toFixed(2)}</h2>
         </div>
         {data.length !== 0 && <div className="h-60">
           <Responsive.ParentSize>

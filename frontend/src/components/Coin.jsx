@@ -18,7 +18,7 @@ const CoinCard = ({name, shopPrices, goldPrice, updated}) => {
     return () => {
       clearInterval(timeHandle);
     }
-  }, [])
+  }, [updated])
 
   return (
       <div className="bg-white rounded-md p-4 text-sm shadow flex flex-col">

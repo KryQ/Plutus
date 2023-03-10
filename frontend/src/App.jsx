@@ -9,7 +9,7 @@ function App() {
   const [coins, updateCoins] = useState([]);
 
   const getCoins = async () => {
-    const response = await fetch('http://localhost:3001/rest/data/newest');
+    const response = await fetch(`/rest/data/newest`);
     const {goldPrice, timestamp, coinPrices} = await response.json();
 
     setCurrentGoldPrice(goldPrice);
@@ -19,7 +19,7 @@ function App() {
 
   useEffect(() => {
     getCoins()
-    const fetchInterval = setInterval(getCoins, 1 * 60 * 1000);
+    const fetchInterval = setInterval(getCoins, 60 * 1000);
 
     return () => {
       clearInterval(fetchInterval)
