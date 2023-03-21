@@ -16,7 +16,8 @@ const coins = {
   ELEMENT_79: '79 Element',
   SILVER_MINT: 'Srebrna Mennica',
   POLISH_MINT: 'Polska Mennica',
-  MINT_OF_GDANSK: "Mennica Gdańsk"
+  MINT_OF_GDANSK: "Mennica Gdańsk",
+  GOLDON: 'Goldon'
 }
 
 const t = (id) => {

@@ -41,14 +41,19 @@ class BaseShop {
     return price;
   }
 
-  getCoinPrice(coin) {
+  async getCoinPrice(coin) {
     const handledCoin = this.coins.find(handledCoin => handledCoin.name === coin);
 
     if (!handledCoin) {
       throw new Error(`Coin not handled by this shop: ${coin}`);
     }
 
-    return this._scrapePrice(handledCoin.path, this.priceSelector);
+    return {
+      price: await this._scrapePrice(handledCoin.path, this.priceSelector),
+      type: handledCoin.type,
+      material: handledCoin.material,
+      currency: handledCoin.currency,
+    };
   }
 
   getAllHandledCoinPrices() {

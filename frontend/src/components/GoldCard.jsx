@@ -1,21 +1,23 @@
 import React, {useCallback, useEffect, useState} from "react";
 import {Event, Glyph, Group, Responsive, Scale, Shape, Tooltip} from '@visx/visx';
 import {bisector, extent} from "d3-array";
-import {parseISO} from "date-fns";
+import {format, parseISO} from "date-fns";
+import host from "../origin.js";
+import {shortDateTime} from "../dateFormats.js";
 
 const LineChart = ({data, width, height}) => {
   // tooltip parameters
   const {tooltipData, tooltipLeft = 0, tooltipTop = 0, showTooltip, hideTooltip} = Tooltip.useTooltip();
 
   // Defining selector functions
-  const getRD = (d) => d?.price || 0;
-  const getDate = (d) => parseISO(d.timestamp) || 0;
-  const bisectDate = bisector((d) => parseISO(d.timestamp)).left;
+  const getRD = (d) => d?.mid || 0;
+  const getDate = (d) => parseISO(d.dateTime) || 0;
+  const bisectDate = bisector((d) => parseISO(d.dateTime)).left;
 
   // get data from a year
-  const getD = (timestamp) => {
+  const getD = (dateTime) => {
     const output = data.filter(function (el) {
-      return el.timestamp === timestamp
+      return el.dateTime === dateTime
     })
     return output
   }
@@ -56,7 +58,7 @@ const LineChart = ({data, width, height}) => {
     }
 
     showTooltip({
-      tooltipData: getD(d.timestamp),
+      tooltipData: getD(d.dateTime),
       tooltipLeft: x,
       tooltipTop: rdScale(getRD(d))
     })
@@ -98,7 +100,7 @@ const LineChart = ({data, width, height}) => {
             {tooltipData && tooltipData.map((d) => (<g>
               <Glyph.GlyphCircle
                   left={tooltipLeft}
-                  top={rdScale(d.price) + 2}
+                  top={rdScale(d.mid) + 2}
                   size={110}
                   fill={"#cbb"}
                   stroke={'white'}
@@ -120,32 +122,35 @@ const LineChart = ({data, width, height}) => {
                 style={tooltipStyles}
             >
               <p>{`Cena złota: $${getRD(tooltipData[0])}`}</p>
+              <p>{`Data: ${format(getDate(tooltipData[0]), shortDateTime)}`}</p>
             </Tooltip.TooltipWithBounds>
         ) : null}
       </div>
   )
 }
 
-const GoldCard = ({goldPrice}) => {
+const GoldCard = () => {
   const [data, setData] = useState([]);
 
   const getGoldPrices = async () => {
-    const response = await fetch(`/rest/gold`);
+    const response = await fetch(`${host}/rest/gold?currency=PLN`);
     const data = await response.json();
 
-    setData(data);
+    setData(data.data);
   }
 
   useEffect(() => {
     getGoldPrices()
   }, [])
 
+
+  const goldPrice = data.length > 0 && data.at(-1).mid;
   return (
       <div className="bg-white  rounded-md overflow-hidden shadow">
-        <div className="flex gap-1 p-2 items-end w-full">
+        {data.length > 0 && <div className="flex gap-1 p-2 items-end w-full">
           <span className="ml-auto">Aktualna cena złota: </span>
           <h2 className="font-mono">{(goldPrice).toFixed(2)}</h2>
-        </div>
+        </div>}
         {data.length !== 0 && <div className="h-60">
           <Responsive.ParentSize>
             {({width, height}) =>

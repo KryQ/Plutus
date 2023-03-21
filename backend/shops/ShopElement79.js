@@ -1,5 +1,6 @@
 import {coins} from "../constants.js";
 import BaseShop from "./BaseShop.js";
+import {EInvestments, EMaterials} from "../models/MInvestmentMetalsPrices.js";
 
 class ShopElement79 extends BaseShop {
   constructor() {
@@ -10,10 +11,14 @@ class ShopElement79 extends BaseShop {
     this.setHandledCoin([
       {
         name: coins.KANGAROO,
+        type: EInvestments.BULLION_COIN,
+        material: EMaterials.GOLD,
         path: '/product/zlote-monety-inwestycyjne/zlota-moneta-australijski-kangur-1-oz-2023/'
       },
       {
         name: coins.KRUGERRAND,
+        type: EInvestments.BULLION_COIN,
+        material: EMaterials.GOLD,
         path: '/product/zlote-monety-inwestycyjne/zlota-moneta-krugerrand-1-oz-2023/'
       },
     ]);

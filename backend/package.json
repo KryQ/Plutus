@@ -1,11 +1,12 @@
 {
-  "name": "gold_info",
-  "version": "0.0.1",
+  "name": "plutus_frontend",
+  "version": "0.1.0",
   "description": "",
   "type": "module",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js"
   },
   "author": "kryq",
   "license": "UNLICENCED",
@@ -15,8 +16,13 @@
     "@seald-io/nedb": "^4.0.1",
     "@xmldom/xmldom": "^0.8.6",
     "cheerio": "^1.0.0-rc.12",
+    "date-fns": "^2.29.3",
     "fastify": "^4.13.0",
+    "lodash": "^4.17.21",
     "node-schedule": "^2.1.1",
+    "pg": "^8.10.0",
+    "pg-hstore": "^2.3.4",
+    "sequelize": "^6.29.3",
     "xpath": "^0.0.32"
   }
 }

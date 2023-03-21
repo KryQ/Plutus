@@ -2,11 +2,10 @@ version: "3.8"
 
 services:
   plutus:
-    image: sha256:f252f2937f01022d24d3cac44177132b55f062f71d6830c533ea625e48247942
-    ports:
-      - 3031:3001
-    volumes:
-      - database:/data
+    image: kryqpl/plutus:latest
+    networks:
+      - plutus_bridge
+      - public
     deploy:
       labels:
         - "traefik.enable=true"
@@ -15,6 +14,28 @@ services:
         - "traefik.http.services.plutus.loadbalancer.server.port=3001"
     environment:
       - NODE_ENV=production
+  db:
+    image: postgres:15.1-alpine3.17
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: mysecretpassword
+      POSTGRES_DB: plutus
+    volumes:
+      - database:/var/lib/postgresql/data
+    networks:
+      - plutus_bridge
+    ports:
+      - "6650:5432"
+
+networks:
+  plutus_bridge:
+  public:
+    external: true
 
 volumes:
   database:
+    driver_opts:
+      type: "nfs"
+      o: "addr=192.168.2.200,nolock,soft,rw"
+      device: ":/Docker/vols/plutus/db"

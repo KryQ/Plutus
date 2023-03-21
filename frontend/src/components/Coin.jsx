@@ -1,11 +1,13 @@
 import {useEffect, useState} from 'react';
-import {t} from "../translations.js";
-import {formatDistanceToNow} from "date-fns";
+import {formatDistanceToNow, parseISO} from "date-fns";
 import {pl} from 'date-fns/locale'
 
-const CoinCard = ({name, shopPrices, goldPrice, updated}) => {
-  const sortedShops = [...shopPrices.sort((a, b) => a.price > b.price ? 1 : -1)];
+import {t} from "../translations.js";
+
+const CoinCard = ({name, data, goldPrice = null}) => {
+  const sortedShops = [...data.sort((a, b) => a.value > b.value ? 1 : -1)];
   const cheapestShop = sortedShops.splice(0, 1).at(0);
+  const updated = parseISO(cheapestShop.createdAt);
 
   const [difference, setDifference] = useState('');
   const [showDetails, setDetailsVisibility] = useState(false);
@@ -28,11 +30,13 @@ const CoinCard = ({name, shopPrices, goldPrice, updated}) => {
             <div className="text-xs text-stone-500">{difference} temu</div>
           </div>
           <div className="ml-auto flex flex-col items-end">
-            <p className="font-light">{t(cheapestShop.name)}</p>
+            <p className="font-light">{t(cheapestShop.shop)}</p>
             <div className="flex gap-1">
-              <span className="text-stone-500 font-light">({(cheapestShop.price - goldPrice).toFixed(2)})</span>
+              {goldPrice !== null &&
+                  <span className="text-stone-500 font-light">({(cheapestShop.value - goldPrice).toFixed(2)})</span>
+              }
               <h3 className="font-bold font-mono text-2xl -mt-2">
-                {cheapestShop.price}
+                {cheapestShop.value}
               </h3>
             </div>
           </div>
@@ -48,11 +52,11 @@ const CoinCard = ({name, shopPrices, goldPrice, updated}) => {
             <tbody>
             {sortedShops.map(shop =>
                 <tr
-                    key={`${name}-${shop.name}`}
+                    key={`${name}-${shop.shop}`}
                     className="my-1"
                 >
-                  <td align="left">{t(shop.name)}</td>
-                  <td className="font-mono" align="right">{shop.price.toFixed(2)} zł</td>
+                  <td align="left">{t(shop.shop)}</td>
+                  <td className="font-mono" align="right">{shop.value.toFixed(2)} zł</td>
                 </tr>)}
             </tbody>
           </table>
