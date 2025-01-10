@@ -1,3 +1,5 @@
+import {ECurrencies} from "./models/SharedTypes.js";
+
 const calculateRatios = ({from, to, exchange}) => {
   if (from === to) return 1;
 

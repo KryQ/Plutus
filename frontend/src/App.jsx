@@ -45,7 +45,7 @@ function App() {
 
   return (
       <div className="p-2 flex flex-col gap-2">
-        <p className="fixed text-sm font-mono bottom-1 right-1 opacity-30 pointer-events-none">0.1.1</p>
+        <p className="fixed text-sm font-mono bottom-1 right-1 opacity-30 pointer-events-none">0.1.2</p>
         <GoldCard/>
         <div className="flex gap-2">
           <div className="basis-1/2"><CurrencyCard from="USD" to="PLN"/></div>

@@ -39,8 +39,8 @@ const CurrencyCard = ({from, to}) => {
                       height={height}
                       tooltip={(x, y) =>
                           <>
-                            <p>{`Kurs wymiany: ${x.toFixed(2)}`}</p>
-                            <p>{`Data: ${format(y, shortDateTime)}`}</p>
+                            <p>Kurs wymiany: {x.toFixed(2)}</p>
+                            <p>Data: {format(y, shortDateTime)}</p>
                           </>
                       }
                   />}

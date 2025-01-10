@@ -1,9 +1,21 @@
 const scrapeExchanges = async () => {
+  fetch("https://www.xe.com/api/protected/midmarket-converter/", {
+    "referrerPolicy": "strict-origin-when-cross-origin",
+    "body": null,
+    "method": "GET"
+  });
+  fetch("https://www.xe.com/api/protected/midmarket-converter/", {
+    "referrerPolicy": "strict-origin-when-cross-origin",
+    "body": null,
+    "method": "GET",
+    "mode": "cors",
+    "credentials": "include"
+  });
   const response = await fetch("https://www.xe.com/api/protected/midmarket-converter/", {
     "headers": {
       "accept": "*/*",
       "accept-language": "en-US,en;q=0.9",
-      "authorization": "Basic bG9kZXN0YXI6REdPTEV4MGNOTzVXTk96NTNFVGc2aWhtY2g5OE1sMkU=",
+      "authorization": "Basic bG9kZXN0YXI6c2hQZ2dUVFNrMExrQ3Z2STd5U2pDZ2VQQ1dEd1hLQmE=",
       "cache-control": "no-cache",
       "pragma": "no-cache",
       "sec-ch-ua": "\"Chromium\";v=\"111\", \"Not(A:Brand\";v=\"8\"",

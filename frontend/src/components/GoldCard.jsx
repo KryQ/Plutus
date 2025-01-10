@@ -36,8 +36,8 @@ const GoldCard = () => {
                     height={height}
                     tooltip={(x, y) =>
                         <>
-                          <p>{`Cena złota: ${x}`}</p>
-                          <p>{`Data: ${format(y, shortDateTime)}`}</p>
+                          <p>Cena złota: {x}</p>
+                          <p>Data: {format(y, shortDateTime)}</p>
                         </>
                     }
                 />}

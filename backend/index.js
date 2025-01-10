@@ -1,8 +1,10 @@
+import {formatDistanceStrict, sub} from "date-fns";
+import {Op, QueryTypes} from "sequelize";
 import Fastify from 'fastify';
 import FastifyStatic from '@fastify/static'
 import FastifyCors from '@fastify/cors'
-import schedule from 'node-schedule';
 import _ from 'lodash';
+import schedule from "node-schedule";
 
 import MGoldPrice from "./models/MGoldPrice.js";
 import MInvestmentMetalsPrices from "./models/MInvestmentMetalsPrices.js";
@@ -10,10 +12,9 @@ import MExchangeRatio from "./models/MExchangeRatio.js";
 import {ECurrencies} from "./models/SharedTypes.js";
 import {getGoldPrice, getHistoricPrice} from "./dataProviders/getGoldPrices.js";
 import scrapeExchanges from "./dataProviders/scrapeCurrenciesExchangeRates.js";
-import getShopsPrices from "./dataProviders/getShopsPrices.js";
+import {getShopsPrices} from "./dataProviders/getShopsPrices.js";
 import db from "./persistentStorage.js";
-import {sub} from "date-fns";
-import {Op} from "sequelize";
+import {calculateRatios} from './utils.js';
 
 const isProduction = process.env.NODE_ENV === 'production';
 
@@ -34,6 +35,83 @@ fastify.get('/rest/sync-db', async (req, rep) => {
   await MInvestmentMetalsPrices.sync({force: true});
   await MExchangeRatio.sync({force: true});
   rep.send({result: 'ok'})
+})
+
+fastify.get('/rest/dashboard/gold', async (req, rep) => {
+  const currentGoldPrice = await MGoldPrice.findOne({
+    where: {
+      currency: 'PLN',
+    },
+    order: [['dateTime', 'DESC']]
+  });
+
+  const lastSamePrice = await MGoldPrice.findOne({
+    where: {
+      currency: 'PLN',
+      dateTime: {[Op.lt]: currentGoldPrice.dateTime},
+      mid: {[Op.lt]: currentGoldPrice.mid}
+    },
+    order: [['dateTime', 'DESC']]
+  });
+
+  const result = await db.query(`
+  select 
+    distinct date_trunc('day', "dateTime") as day, 
+    avg(mid) as mid 
+    from "GoldPrices" gp 
+    where currency ='PLN' and "dateTime" > :period
+    group by day 
+    order by day desc`,
+      {
+        type: QueryTypes.SELECT,
+        replacements: {
+          period: sub(new Date(), {months: 1}).toISOString()
+        }
+      });
+
+  return {
+    name: 'AU',
+    currentPrice: currentGoldPrice.mid,
+    lastSamePrice: formatDistanceStrict(currentGoldPrice.dateTime, lastSamePrice.dateTime),
+    period: result.map(res => ({value: res.mid, freeDay: false})).reverse()
+  }
+})
+
+fastify.get('/rest/dashboard/currency/:currency', async (req, rep) => {
+  let desiredCurrency = req.params.currency || 'PLN';
+  desiredCurrency = desiredCurrency.toLowerCase();
+
+  const currentCurrencyPrice = await MExchangeRatio.findOne({
+    order: [['dateTime', 'DESC']]
+  });
+
+  const result = await db.query(`
+  select 
+    distinct date_trunc('day', "dateTime") as day, 
+    avg(pln) as pln,
+    avg(eur) as eur,
+    avg(chf) as chf 
+    from "ExchangeRatios" er 
+    where "dateTime" > :period
+    group by day 
+    order by day desc`,
+      {
+        type: QueryTypes.SELECT,
+        replacements: {
+          period: sub(new Date(), {months: 1}).toISOString()
+        }
+      });
+
+
+  return {
+    name: desiredCurrency.toUpperCase(),
+    currentPrice: calculateRatios({from: desiredCurrency, to: 'pln', exchange: currentCurrencyPrice}),
+    //lastSamePrice: formatDistanceStrict(currentGoldPrice.dateTime, lastSamePrice.dateTime),
+    period: result.map(res => ({
+      value: calculateRatios({from: desiredCurrency, to: 'pln', exchange: res}),
+      freeDay: false
+    })).reverse()
+  }
 })
 
 // TODO: For first 3 months we can get 1hr resolution.
@@ -68,12 +146,13 @@ fastify.get('/rest/seed-gold-prices', async (req, rep) => {
 });
 
 fastify.get('/rest/investments', async () => {
-  const coinPrices = await db.query(
-      'select * from "InvestmentMetals" im where "createdAt" in (select max("createdAt") as createdAt from "InvestmentMetals" group by "name", "shop");',
-      {
-        model: MInvestmentMetalsPrices,
-        mapToModel: true,
-      })
+  const coinPrices = await MInvestmentMetalsPrices.findAll({
+    where: {
+      createdAt: {
+        [Op.gte]: sub(new Date(), {minutes: 10}).toISOString()
+      }
+    }
+  });
 
   return _.groupBy(coinPrices, 'name');
 })
@@ -118,17 +197,6 @@ fastify.get('/rest/gold', async (request) => {
   return {data: goldPrices, lastSamePrice};
 });
 
-const calcRatios = ({from, to, exchange}) => {
-  if (from === to) return 1;
-
-  let multiplier = 1;
-  if (from.toUpperCase() !== ECurrencies.USD) {
-    multiplier = 1 / exchange[from];
-  }
-
-  return to.toLowerCase() === 'usd' ? multiplier : exchange[to] * multiplier;
-}
-
 fastify.get('/rest/currency', async (request) => {
   let {from, to} = request.query;
   from = from.toLowerCase();
@@ -146,7 +214,7 @@ fastify.get('/rest/currency', async (request) => {
   })
 
   return rawExchangeRates.map(exchange => ({
-    currency: calcRatios({
+    currency: calculateRatios({
       from, to, exchange
     }),
     dateTime: exchange.dateTime
@@ -207,9 +275,10 @@ const scrapeAndStoreShopsPrices = async () => {
 };
 
 const main = async () => {
+  await scrapeAndStoreShopsPrices();
   schedule.scheduleJob('*/10 * * * *', scrapeAndStoreExchangeRates)
-  //schedule.scheduleJob('*/10 * * * *', scrapeAndStoreGoldPrices)
-  //schedule.scheduleJob('*/10 * * * *', scrapeAndStoreShopsPrices)
+  schedule.scheduleJob('*/10 * * * *', scrapeAndStoreGoldPrices)
+  schedule.scheduleJob('*/10 * * * *', scrapeAndStoreShopsPrices)
 
   await fastify.listen({
     port: 3001,

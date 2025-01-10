@@ -9,7 +9,6 @@ import ShopPolishMint from "../shops/ShopPolishMint.js";
 import {coins} from "../constants.js";
 import ShopSilverMint from "../shops/ShopSilverMint.js";
 import ShopMetalMarket from "../shops/ShopMetalMarket.js";
-import ShopMintOfGdansk from "../shops/ShopMintOfGdansk.js";
 import ShopChojnackiKwiecien from "../shops/ShopChojnackiKwiecien.js";
 import ShopGoldon from "../shops/ShopGoldon.js";
 
@@ -25,7 +24,7 @@ const shops = [
   new ShopPolishMint(),
   new ShopSilverMint(),
   new ShopMetalMarket(),
-  new ShopMintOfGdansk(),
+  // new ShopMintOfGdansk(), Temporarly disabled
   new ShopChojnackiKwiecien()
 ]
 
@@ -51,4 +50,6 @@ const getShopsPrices = async () => {
   return coinPrices.flat(1);
 }
 
-export default getShopsPrices;
+const getShopsIds = () => shops.map(shop => shop.id);
+
+export {getShopsPrices, getShopsIds};
