@@ -9,8 +9,8 @@ jobs:
     steps:
       - name: Check out repository code
         uses: actions/checkout@v4
-      - name: Pull phrase
+      - name: Push phrase
         uses: phrase/setup-cli@v1
         with:
           version: 2.19.0
-      - run: phrase pull --tag ${{ env.BRANCH_NAME }}
+      - run: phrase push --tag ${{ env.BRANCH_NAME }}
